@@ -1,11 +1,14 @@
-import face_recognition
+from deepface import DeepFace
+import cv2
 import numpy as np
 import json
 
 def get_embedding(image):
-    rgb_img = image[:, :, ::-1]  # BGR to RGB
-    encodings = face_recognition.face_encodings(rgb_img)
-    return encodings[0] if encodings else None
+    try:
+        embedding = DeepFace.represent(image, model_name="Facenet")[0]["embedding"]
+        return embedding
+    except:
+        return None
 
 def load_knowledge_base(path="knowledge_base.json"):
     try:
