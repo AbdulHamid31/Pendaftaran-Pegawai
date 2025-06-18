@@ -1,11 +1,9 @@
 from deepface import DeepFace
-import cv2
-import numpy as np
 import json
 
 def get_embedding(image):
     try:
-        embedding = DeepFace.represent(image, model_name="Facenet")[0]["embedding"]
+        embedding = DeepFace.represent(image, model_name="SFace")[0]["embedding"]
         return embedding
     except:
         return None
