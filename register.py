@@ -1,4 +1,3 @@
-
 import streamlit as st
 import cv2
 import numpy as np
@@ -20,10 +19,10 @@ if img_file is not None and name:
         kb = load_knowledge_base()
         kb.append({
             "user": name,
-            "embedding": embedding.tolist(),
+            "embedding": embedding,
             "threshold": 0.6
         })
         save_knowledge_base(kb)
         st.success(f"✅ Pegawai '{name}' berhasil didaftarkan!")
     else:
-        st.warning("⚠️ Tidak ada wajah terdeteksi. Silakan coba ulangi dengan posisi wajah yang jelas.")
+        st.warning("⚠️ Wajah tidak terdeteksi. Silakan coba ulangi dengan posisi wajah yang jelas.")
