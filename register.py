@@ -1,28 +1,50 @@
 import streamlit as st
-import cv2
-import numpy as np
-from utils import get_embedding, save_knowledge_base, load_knowledge_base
 
-st.set_page_config(page_title="Pendaftaran Wajah Pegawai", layout="centered")
-st.title("📝 Daftarkan Wajah Pegawai Baru")
+st.title("📊 Diagram Alur Penelitian Otomatis")
 
-name = st.text_input("Masukkan Nama Pegawai")
-img_file = st.camera_input("Ambil Foto Wajah Pegawai")
+st.write("Masukkan langkah-langkah alur dengan format seperti ini:")
+st.code("""
+[Mulai]
+   ↓
+[Perumusan Masalah]
+   ↓
+...
+[Selesai]
+""", language="text")
 
-if img_file is not None and name:
-    bytes_data = img_file.getvalue()
-    image = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
-    st.image(image, channels="BGR", caption="📷 Foto yang diambil")
+steps_input = st.text_area("Langkah-langkah alur penelitian:", """
+[Mulai]
+   ↓
+[Perumusan Masalah]
+   ↓
+[Pengumpulan Dataset Dota 2]
+   ↓
+[Preprocessing Data]
+   ↓
+[Ekstraksi Fitur Time-Series & Sosial]
+   ↓
+[Embedding Graph dengan DeepWalk/LINE]
+   ↓
+[Clustering dengan K-Means]
+   ↓
+[Evaluasi & Visualisasi Klaster]
+   ↓
+[Interpretasi Hasil & Simpulan]
+   ↓
+[Selesai]
+""")
 
-    embedding = get_embedding(image)
-    if embedding is not None:
-        kb = load_knowledge_base()
-        kb.append({
-            "user": name,
-            "embedding": embedding,
-            "threshold": 0.6
-        })
-        save_knowledge_base(kb)
-        st.success(f"✅ Pegawai '{name}' berhasil didaftarkan!")
+if st.button("Buat Diagram"):
+    # Proses parsing
+    lines = [line.strip('[]').strip() for line in steps_input.splitlines() if line.strip() and not line.strip().startswith('↓')]
+    if len(lines) < 2:
+        st.error("Masukkan minimal 2 langkah.")
     else:
-        st.warning("⚠️ Wajah tidak terdeteksi. Silakan coba ulangi dengan posisi wajah yang jelas.")
+        edges = [f'"{lines[i]}" -> "{lines[i+1]}"' for i in range(len(lines)-1)]
+        graph_code = "digraph ResearchFlow {\n" \
+                      "rankdir=TB;\n" \
+                      "node [shape=box, style=rounded, color=blue];\n" + \
+                      "\n".join(edges) + "\n}"
+
+        st.subheader("Hasil Diagram Alur:")
+        st.graphviz_chart(graph_code)
